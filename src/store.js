@@ -1,8 +1,5 @@
-import { configureStore } from "@reduxjs/toolkit";
-import usersReducer from "./features/users/usersSlice";
+import { createCtx, connectLogger } from "@reatom/framework";
 
-export default configureStore({
-  reducer: {
-    users: usersReducer
-  }
-});
+export const ctx = createCtx();
+
+connectLogger(ctx);

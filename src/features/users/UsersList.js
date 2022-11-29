@@ -1,18 +1,14 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  fetchUsers,
-  removeUser,
-  selectTotalUsers,
-  selectAllUsers
-} from "./usersSlice";
+import { useAtom, useAction } from "@reatom/npm-react";
+import { fetchUsers, removeUser } from "./usersSlice";
 import styles from "./UsersList.module.css";
 
 export function UsersList() {
-  const count = useSelector(selectTotalUsers);
-  const users = useSelector(selectAllUsers);
-  const usersLoading = useSelector(state => state.users.loading);
-  const dispatch = useDispatch();
+  const [users] = useAtom(fetchUsers.dataAtom);
+  const [count] = useAtom((ctx) => ctx.spy(fetchUsers.dataAtom).length);
+  const [isLoading] = useAtom((ctx) => ctx.spy(fetchUsers.pendingAtom) > 0);
+  const handleFetchUsers = useAction(fetchUsers);
+  const handleRemoveUser = useAction(removeUser);
 
   return (
     <div>
@@ -20,8 +16,8 @@ export function UsersList() {
         <button
           className={styles.button}
           aria-label="Fetch Users"
-          onClick={() => dispatch(fetchUsers())}
-          disabled={usersLoading}
+          onClick={handleFetchUsers}
+          disabled={isLoading}
         >
           Fetch Users
         </button>
@@ -30,15 +26,13 @@ export function UsersList() {
         There are <span className={styles.value}>{count}</span> users.{" "}
         {count === 0 && `Why don't you fetch some more?`}
       </div>
-      {users.map(user => (
+      {users.map((user) => (
         <div className={styles.row} key={user.id}>
-          <div style={{ width: "80%" }}>{`${user.first_name} ${
-            user.last_name
-          }`}</div>
+          <div
+            style={{ width: "80%" }}
+          >{`${user.first_name} ${user.last_name}`}</div>
           <div style={{ width: "20%" }}>
-            <button onClick={() => dispatch(removeUser(user.id))}>
-              remove
-            </button>
+            <button onClick={() => handleRemoveUser(user.id)}>remove</button>
           </div>
         </div>
       ))}
